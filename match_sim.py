@@ -1,14 +1,20 @@
-from unittest import result
-from matplotlib.pyplot import draw
 from understat_scrapper import UnderstatScrapper
 import pandas as pd
 from random import randint
+from numpy import mean
+import matplotlib.pyplot as plt
+
 
 class MatchSim:
 
     def __init__(self, home_frame, away_frame):
         self.home_goals = home_frame["xG"].astype(float).tolist()
         self.away_goals = away_frame["xG"].astype(float).tolist()
+        self.mean_home_points = 0
+        self.mean_away_points = 0
+        self.home_wins = 0
+        self.away_wins = 0
+        self.draws = 0
         cols =["Home Goals", "Away Goals", "Goal Difference", "Home Points", "Away Points"]
         self.results_df = pd.DataFrame(columns = cols)
 
@@ -39,17 +45,47 @@ class MatchSim:
                                       home_points,
                                       away_points]
 
-    def get_average(self, n):
+    def get_results(self, n):
         for match in range(1, n):
             self.play_match(match)
-        results = self.results_df["Result"].tolist()
-        print(f"Across {n} matches")
-        print("Home wins:", results.count("Home win"))
-        print("Away wins:", results.count("Away win"))
-        print("Draws:", results.count("Draw"))
-        print("Average home GD:", self.results_df["Goal Difference"].mean())
+        home_points_list = self.results_df["Home Points"].tolist()
+        away_points_list = self.results_df["Away Points"].tolist()
+        self.mean_home_points = mean(home_points_list)
+        self.mean_away_points = mean(away_points_list)
+
+    def count_results(self):
+        home_points_list = self.results_df["Home Points"].tolist()
+        for result in home_points_list:
+            if result == 3:
+                self.home_wins += 1
+            elif result == 1:
+                self.draws += 1
+            elif result == 0:
+                self.away_wins += 1
+
+    def pie_chart(self):
+        counts = [self.home_wins, self.away_wins, self.draws]
+        labels = ["Home win", "Away win", "Draw"]
+        plt.pie(counts, labels = labels)
+        plt.show()       
+
+    def histogram(self):
+        gd = self.results_df["Goal Difference"].tolist()
+        plt.hist(gd)
+        plt.show()
+
+    def output_results(self):
+        self.get_results(10000)
+        self.count_results()
+        print("Average home points:", self.mean_home_points)
+        print("Average away points:", self.mean_away_points)
+        self.pie_chart()
+        self.histogram()
+
+
+
 
 if __name__ == "__main__":
     scrapper = UnderstatScrapper()
     sim = MatchSim(scrapper.home_shot_table, scrapper.away_shot_table)
-    sim.get_average(10000)
+    sim.output_results()
