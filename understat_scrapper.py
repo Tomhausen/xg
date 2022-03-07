@@ -9,6 +9,10 @@ class UnderstatScrapper:
     base_url = "https://understat.com/match/"
 
     def __init__(self):
+        self.home_team = None
+        self.away_team = None
+        self.home_shot_table = None
+        self.away_shot_table = None        
         self.minute = []
         self.x = []
         self.y = []
@@ -25,16 +29,10 @@ class UnderstatScrapper:
                      self.last_action, self.team]
         self.json_keys = ["minute", "X", "Y", "xG", "result", "situation",
                           "shotType", "player", "player_assisted", "lastAction"]
-        match_id = self.get_match_id()
-        url = self.base_url + match_id
+        url = self.base_url + self.get_match_id()
         self.data = self.get_json(url)
-        self.extract_json_to_lists("h")
-        self.home_shot_table = self.build_data_frame()
-        for list in self.cols:
-            list.clear()
-        self.extract_json_to_lists("a")
-        self.away_shot_table = self.build_data_frame()
-
+        self.get_frames()
+        self.get_teams()
 
     def get_match_id(self):
         match_id = input("Please enter match id: ")
@@ -67,6 +65,14 @@ class UnderstatScrapper:
         data = json.loads(json_data)
         return data
 
+    def get_frames(self):    
+        self.extract_json_to_lists("h")
+        self.home_shot_table = self.build_data_frame()
+        for list in self.cols:
+            list.clear()
+        self.extract_json_to_lists("a")
+        self.away_shot_table = self.build_data_frame()
+
     def extract_json_to_lists(self, side):
         for shot in self.data[side]:
             for column_index in range(len(self.cols)-1):
@@ -83,9 +89,13 @@ class UnderstatScrapper:
         shot_map_df = shot_map_df.T
         return shot_map_df
 
+    def get_teams(self):
+        self.home_team = self.home_shot_table["Team"][0]
+        self.away_team = self.away_shot_table["Team"][0]
+
 
 if __name__ == "__main__":
     scrapper = UnderstatScrapper()
-    print(scrapper.home_shot_table)
-    print(scrapper.away_shot_table)
+    print(scrapper.home_team)
+    print(scrapper.away_team)
 

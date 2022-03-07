@@ -7,7 +7,10 @@ import matplotlib.pyplot as plt
 
 class MatchSim:
 
-    def __init__(self, home_frame, away_frame):
+    def __init__(self, match):
+        self.match = match
+        home_frame = match.home_shot_table
+        away_frame = match.away_shot_table
         self.home_goals = home_frame["xG"].astype(float).tolist()
         self.away_goals = away_frame["xG"].astype(float).tolist()
         self.mean_home_points = 0
@@ -65,7 +68,7 @@ class MatchSim:
 
     def pie_chart(self):
         counts = [self.home_wins, self.away_wins, self.draws]
-        labels = ["Home win", "Away win", "Draw"]
+        labels = [f"{self.match.home_team} win", f"{self.match.away_team} win", "Draw"]
         plt.pie(counts, labels = labels)
         plt.show()       
 
@@ -77,15 +80,13 @@ class MatchSim:
     def output_results(self):
         self.get_results(10000)
         self.count_results()
-        print("Average home points:", self.mean_home_points)
-        print("Average away points:", self.mean_away_points)
+        print(f"{self.match.home_team}'s average points:", self.mean_home_points)
+        print(f"{self.match.away_team}'s average points:", self.mean_away_points)
         self.pie_chart()
         self.histogram()
 
 
-
-
 if __name__ == "__main__":
     scrapper = UnderstatScrapper()
-    sim = MatchSim(scrapper.home_shot_table, scrapper.away_shot_table)
+    sim = MatchSim(scrapper)
     sim.output_results()
