@@ -15,7 +15,10 @@ class Scrapper:
         res = requests.get(url)
         soup = BeautifulSoup(res.content, "lxml")
         scripts = soup.find_all("script")
-        strings = str(scripts[1])
+        try:
+            strings = str(scripts[1])
+        except IndexError:
+            return
         index_start = strings.index("('") + 2
         index_end = strings.index("')")
         json_data = strings[index_start: index_end]

@@ -1,4 +1,4 @@
-from understat_scrapper import UnderstatScrapper
+from match_scrapper import UnderstatScrapper
 import pandas as pd
 from random import randint
 from numpy import mean
@@ -9,8 +9,8 @@ class MatchSim:
 
     def __init__(self, match):
         self.match = match
-        home_frame = match.home_shot_table
-        away_frame = match.away_shot_table
+        home_frame = match.home_df
+        away_frame = match.away_df
         self.home_goals = home_frame["xG"].astype(float).tolist()
         self.away_goals = away_frame["xG"].astype(float).tolist()
         self.mean_home_points = 0
@@ -87,6 +87,6 @@ class MatchSim:
 
 
 if __name__ == "__main__":
-    scrapper = UnderstatScrapper()
+    scrapper = UnderstatScrapper(16660)
     sim = MatchSim(scrapper)
     sim.output_results()

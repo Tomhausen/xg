@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from understat_scrapper import UnderstatScrapper
+from match_scrapper import UnderstatScrapper
 
 class XgFlowChart:
 

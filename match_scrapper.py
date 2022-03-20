@@ -7,13 +7,13 @@ import pandas as pd
 
 class UnderstatScrapper(Scrapper):
 
-    def __init__(self):
+    def __init__(self, match_id):
         Scrapper.__init__(self)
         self.home_team = ""
         self.away_team = ""
         self.home_df = None
         self.away_df = None        
-        
+        self.match_id = match_id
         self.minute = []
         self.x = []
         self.y = []
@@ -32,9 +32,13 @@ class UnderstatScrapper(Scrapper):
                           "shotType", "player", "player_assisted", "lastAction"]
 
     def run(self):
-        url = self.base_url + "match/" + self.get_match_id()
+        url = self.base_url + "match/" + str(self.match_id)
         self.get_json(url)
-        self.data = self.data[0]
+        try: 
+            self.data = self.data[0]
+        except IndexError:
+            self.home_team = "404 error"
+            return
         self.get_frames()
         self.get_teams()
 
@@ -83,9 +87,10 @@ class UnderstatScrapper(Scrapper):
 
 
 if __name__ == "__main__":
-    scrapper = UnderstatScrapper()
+    # for match in range(16376, 16673):
+    #     scrapper = UnderstatScrapper(match)
+    #     scrapper.run()
+    #     print(f"{match}: {scrapper.home_team} vs {scrapper.away_team}")
+
+    scrapper = UnderstatScrapper(16660)
     scrapper.run()
-    print(scrapper.home_df)
-    print(scrapper.away_df)
-    print(scrapper.home_team)
-    print(scrapper.away_team)
